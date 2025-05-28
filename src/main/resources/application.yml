@@ -1,0 +1,68 @@
+server:
+  port: 8081
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: Ov23liFAWFzT8Jj3Fb9W
+            client-secret: a0812d110a41d0b2fa3e9dcf18e9f15689266362
+            scope: read:user, user:email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/oauth2/callback/github"
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+
+  main:
+    banner-mode: log
+
+  datasource:
+    url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: sa
+    password: sa
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        # Format queries
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    open-in-view: true
+
+app:
+  oauth2:
+    # After successfully authenticating with the OAuth2 Provider,
+    # we'll be generating an auth token for the user and sending the token to the
+    # redirectUri mentioned by the frontend client in the /oauth2/authorize request.
+    # We're not using cookies because they won't work well in mobile clients.
+    authorizedRedirectUris:
+      - http://localhost:3000/oauth2/redirect
+      - myandroidapp://oauth2/redirect
+      - myiosapp://oauth2/redirect
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    prometheus:
+      enabled: true
