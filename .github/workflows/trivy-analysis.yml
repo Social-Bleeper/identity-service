@@ -12,11 +12,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Build an image from Dockerfile
-        run: docker build -t docker.io/my-organization/my-app:${{ github.sha }} .
+        run: docker build -t docker.io/kapiteinbas/bleepblob-identity-service:latest .
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
+          image-ref: 'docker.io/kapiteinbas/bleepblob-identity-service:latest'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
