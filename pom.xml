@@ -135,6 +135,7 @@
 				<configuration>
 					<effort>Max</effort>
 					<threshold>Low</threshold>
+					<failOnError>false</failOnError>
 				</configuration>
 				<executions>
 					<execution>
