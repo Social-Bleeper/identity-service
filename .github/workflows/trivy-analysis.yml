@@ -1,24 +1,38 @@
-name: Trivy Security Analysis
+name: Trivy Security Scan
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
+    branches: [main]
+
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-24.04
+  trivy-scan:
+    runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout source code
         uses: actions/checkout@v3
-      - name: Build an image from Dockerfile
-        run: docker build -t docker.io/kapiteinbas/bleepblob-identity-service:latest .
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy -y
+
+      - name: Run Trivy filesystem scan
+        run: trivy fs --exit-code 1 --severity HIGH,CRITICAL .
+
+      - name: Upload Trivy report
+        if: always()
+        run: trivy fs --format table --output trivy-report.txt .
+
+      - name: Upload report as artifact
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
-          image-ref: 'docker.io/kapiteinbas/bleepblob-identity-service:latest'
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+          name: trivy-report
+          path: trivy-report.txt
