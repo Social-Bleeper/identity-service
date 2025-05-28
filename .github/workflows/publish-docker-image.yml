@@ -20,7 +20,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: kapiteinbas/spotify-security-spring-boot
+          images: kapiteinbas/bleepblob-identity-service
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
@@ -32,7 +32,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./spotify-clone.Dockerfile
+          file: ./Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
