@@ -23,6 +23,8 @@ jobs:
 
       - name: Build project
         run: mvn clean verify -DskipTests=false
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
 
       - name: Run Snyk Vulnerability Scan
         uses: snyk/actions/maven@master
