@@ -25,7 +25,7 @@ jobs:
         run: mvn clean verify -DskipTests=false
 
       - name: Run Snyk Vulnerability Scan
-        uses: snyk/actions/maven@v1
+        uses: snyk/actions/maven@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
