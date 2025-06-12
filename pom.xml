@@ -49,6 +49,13 @@
 		</dependency>
 
 		<dependency>
+			<groupId>io.sentry</groupId>
+			<artifactId>sentry-spring-boot-starter</artifactId>
+			<version>7.5.0</version> <!-- Use latest stable version -->
+		</dependency>
+
+
+		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
 			<version>${jjwt.version}</version>

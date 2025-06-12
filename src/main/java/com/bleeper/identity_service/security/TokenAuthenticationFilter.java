@@ -1,5 +1,6 @@
 package com.bleeper.identity_service.security;
 
+import io.sentry.Sentry;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -43,6 +45,9 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (AuthenticationException ex) {
+            Sentry.captureException(ex);  // log to Sentry
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Failed");
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
         }

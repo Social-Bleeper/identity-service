@@ -11,8 +11,10 @@ import com.bleeper.identity_service.repositories.UserRepository;
 import com.bleeper.identity_service.security.TokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -36,23 +39,27 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> authenticateAdmin(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<String> authenticateAdmin(@Valid @RequestBody LoginRequest loginRequest) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(authentication);
 
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(authentication);
+            String token = tokenProvider.createToken(authentication);
 
-        String token = tokenProvider.createToken(authentication);
-
-        return ResponseEntity
-                .ok(new AuthResponse(token));
+            return ResponseEntity
+                    .ok(token);
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("error: " + ex.getMessage());
+        }
     }
 
     @GetMapping
