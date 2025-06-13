@@ -51,6 +51,7 @@ public class SecurityConfig {
         return new TokenAuthenticationFilter();
     }
 
+    /* added for merge request */
     /*
       By default, Spring OAuth2 uses HttpSessionOAuth2AuthorizationRequestRepository to save
       the authorization request. But, since our service is stateless, we can't save it in
